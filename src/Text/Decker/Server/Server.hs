@@ -118,7 +118,11 @@ runHttpServer context = do
     -- a path can be served statically, it will not be routed. this is
     -- the opposite of what wie want here. we want to serve static files
     -- as a fallback.
-    middleware $ modifyResponse (mapResponseHeaders (("Cache-Control", "no-store") :))
+    middleware $ modifyResponse (mapResponseHeaders (\hs ->
+      [ ("Cache-Control", "no-store")
+      , ("Cross-Origin-Opener-Policy", "same-origin")
+      , ("Cross-Origin-Embedder-Policy", "require-corp")
+      ] ++ hs))
     when (context ^. devRun) $ do
       -- first tries the resource pack
       resourceMiddleware "support" packSource
